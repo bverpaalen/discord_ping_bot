@@ -8,14 +8,38 @@ class everyone(commands.Cog):
         self.bot = bot
         self.parser = Parser()
         self.env = os.getenv
+        self.admins = self.env("ADMINS")
+
+    @commands.command()
+    async def force_everyone(self, ctx):
+        if str(ctx.message.author.id) in self.admins:
+            mentions = "PING PING "
+
+            x = ctx.channel.members
+            for member in x:
+                mention = "<@" + str(member.id) + ">"
+                mentions += mention + " "
+            mentions += " PING PING PING"
+
+            await ctx.message.channel.send(mentions)
+            await self.ping_person(ctx, self.env("SYMEN_ID"))
+        else:
+            await self.no_admin(ctx)
+
+    async def no_admin(self, ctx):
+        await ctx.message.channel.send("Dit mag jij helemaal niet gebruiken BOEF!")
+        for i in range(int(self.env("RETURN_SPAM_THRESHOLD"))):
+            await self.ping_person(ctx, ctx.message.author.id)
 
     @commands.command()
     async def everyone(self, ctx):
         x = ctx.channel.members
+        no_ping = self.env("NO_PING")
         mentions = "PING PING "
         for member in x:
-            mention = "<@" + str(member.id) + ">"
-            mentions += mention + " "
+            if str(member.id) not in no_ping:
+                mention = "<@" + str(member.id) + ">"
+                mentions += mention + " "
         mentions += " PING PING PING"
 
         await ctx.message.channel.send(mentions)
