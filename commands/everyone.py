@@ -67,6 +67,19 @@ class everyone(commands.Cog):
         for i in range(amount):
             await self.ping_person(ctx, self.env("SYMEN_ID"))
 
+    @commands.command()
+    async def add_no_ping(self, ctx):
+        no_ping_list = self.env("NO_PING")[1:-1].split(",")
+        if str(ctx.message.author.id) not in no_ping_list:
+            no_ping_list.append(str(ctx.message.author.id))
+            write_list = "["
+
+            for id in no_ping_list:
+                write_list += str(id) + ","
+            write_list = write_list[:-1] + "]"
+
+            os.environ["NO_PING"] = str(write_list)
+
 
 def setup(bot):
     bot.add_cog(everyone(bot))
