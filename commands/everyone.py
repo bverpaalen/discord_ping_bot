@@ -33,6 +33,9 @@ class everyone(commands.Cog):
 
     @commands.command()
     async def everyone(self, ctx):
+        await self.everyone_message(ctx)
+
+    async def everyone_message(self, ctx, before="", after=""):
         x = ctx.channel.members
         no_ping = self.env("NO_PING")
         mentions = "PING PING "
@@ -42,11 +45,12 @@ class everyone(commands.Cog):
                 mentions += mention + " "
         mentions += " PING PING PING"
 
+        mentions = str(before) + mentions + str(after)
         await ctx.message.channel.send(mentions)
         await self.ping_person(ctx, self.env("SYMEN_ID"))
 
-    async def ping_person(self, ctx, person_id):
-        await ctx.message.channel.send("<@"+str(person_id)+">")
+    async def ping_person(self, ctx, person_id, before="", after=""):
+        await ctx.message.channel.send(str(before) + "<@"+str(person_id)+">" + str(after))
 
     @commands.command()
     async def EVERYONE(self, ctx, amount=2):
@@ -56,11 +60,13 @@ class everyone(commands.Cog):
             over_request = amount - threshold
             amount = threshold
 
-        for i in range(amount):
-            await self.everyone(ctx)
+        for i in range(1, amount+1):
+            before = "(" + str(i) + "/" + str(amount) + "): "
+            await self.everyone_message(ctx, before=before)
 
-        for i in range(over_request):
-            await self.ping_person(ctx, ctx.message.author.id)
+        for i in range(1, over_request+1):
+            before = "(" + str(i) + "/" + str(over_request) + "): "
+            await self.ping_person(ctx, ctx.message.author.id, before=before)
 
     @commands.command()
     async def SYMEN(self, ctx, amount=10):
@@ -98,3 +104,4 @@ class everyone(commands.Cog):
 
 def setup(bot):
     bot.add_cog(everyone(bot))
+
